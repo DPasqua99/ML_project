@@ -4,8 +4,8 @@ from sklearn.model_selection import train_test_split
 from LinearRegression import LinearRegression
 from LinearRegression import r2_score
 
-
-dataset = pd.read_excel(r"D:\Universita\IV-anno\ML e DL\Esercizi\Datasets\Combined_cycle_plants.ods", engine='odf', sheet_name="Sheet2")
+path = "..\datasets\Combined_cycle_plants.ods"
+dataset = pd.read_excel(path, engine='odf', sheet_name="Sheet2")
 dataset.head()
 
 target = dataset['PE']
@@ -19,7 +19,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y,
 
 print(X_train.shape, X_test.shape)
 
-regressor = LinearRegression( learning_rate=0.1, mode=2, )
+regressor = LinearRegression( learning_rate=0.1)
 regressor.fit(X_train, y_train)
 
 y_pred = regressor.predict(X_test)
