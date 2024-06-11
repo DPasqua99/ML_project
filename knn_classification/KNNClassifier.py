@@ -1,11 +1,12 @@
 import numpy as np
-from collections import Counter
+from collections import Counter, defaultdict
 
 class KNNClassifier:
     
-    def __init__(self, k, p=2):
+    def __init__(self, k, p=2, weighted=False):
         self.k = k
         self.p = p
+        self.weighted = weighted
         self.X = None
         self.y = None
 
@@ -28,8 +29,25 @@ class KNNClassifier:
             # Preleva le etichette dei k punti più vicini
             k_labels = self.y[k_indices]
             
-            # Vota per l'etichetta più comune tra i k punti più vicini
-            most_common = Counter(k_labels).most_common(1)
-            y_pred.append(most_common[0][0])
+            if self.weighted:
+                # Preleva le distanze dei k punti più vicini
+                k_distances = np.array(distances)[k_indices]
+                
+                # Crea un dizionario per sommare i pesi delle etichette
+                weight_dict = defaultdict(float)
+                
+                for label, distance in zip(k_labels, k_distances):
+                    if distance != 0:  # evitare divisioni per zero
+                        weight_dict[label] += 1 / distance
+                    else:  # se la distanza è zero, il peso è molto alto
+                        weight_dict[label] += float('inf')
+                
+                # Trova l'etichetta con il peso massimo
+                max_weight_label = max(weight_dict, key=weight_dict.get)
+                y_pred.append(max_weight_label)
+            else:
+                # Vota per l'etichetta più comune tra i k punti più vicini
+                most_common = Counter(k_labels).most_common(1)
+                y_pred.append(most_common[0][0])
         
         return y_pred
